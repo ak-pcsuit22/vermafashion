@@ -1186,9 +1186,9 @@ if __name__ == '__main__':
     # Allow running on the local network by binding to 0.0.0.0 by default.
     host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
     try:
-        port = int(os.environ.get('PORT', '5000'))
+        port = int(os.environ.get('PORT', '10000'))
     except Exception:
-        port = 5000
+        port = 10000
     debug = os.environ.get('FLASK_DEBUG', '1') in ('1', 'true', 'True')
     # Try to determine the machine's LAN IP for convenience printing (best-effort)
     local_ip = '127.0.0.1'
