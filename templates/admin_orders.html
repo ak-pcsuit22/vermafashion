@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Admin — Orders — Verma Fashions{% endblock %}
+{% block content %}
+  <h2>Admin — Orders</h2>
+  {# Tabs moved to navbar; keep page focused on orders #}
+  <section class="received-orders">
+    <h3>Received Orders</h3>
+    <div class="orders-list">
+      {% for o in orders %}
+        <div class="order-card card">
+          <div class="order-left">
+            <div class="order-id">#{{ o.id }}</div>
+            <div class="order-product">{{ o.product }} × {{ o.quantity }}</div>
+          </div>
+          <div class="order-right">
+            <div class="order-meta">{{ o.status }} • {{ o.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+            <div class="order-buyer">{{ o.user.name }} — {{ o.user.email }}</div>
+            {% if o.name or o.phone or o.address or o.house_no or o.street or o.block or o.village or o.city or o.state or o.zipcode %}
+              <div class="order-contact">
+                {% if o.name %}<div><strong>Contact name:</strong> {{ o.name }}</div>{% endif %}
+                {% if o.phone %}<div><strong>Phone:</strong> {{ o.phone }}</div>{% endif %}
+                {% if o.address %}
+                  <div class="order-address"><strong>Full address:</strong> {{ o.address }}</div>
+                {% endif %}
+                <div class="order-address-components">
+                  {% if o.house_no %}<div><strong>House/Flat:</strong> {{ o.house_no }}</div>{% endif %}
+                  {% if o.street %}<div><strong>Street:</strong> {{ o.street }}</div>{% endif %}
+                  {% if o.block %}<div><strong>Block/Sector:</strong> {{ o.block }}</div>{% endif %}
+                  {% if o.village %}<div><strong>Village/Area:</strong> {{ o.village }}</div>{% endif %}
+                  {% if o.city %}<div><strong>City:</strong> {{ o.city }}</div>{% endif %}
+                  {% if o.state %}<div><strong>State:</strong> {{ o.state }}</div>{% endif %}
+                  {% if o.zipcode %}<div><strong>Zipcode:</strong> {{ o.zipcode }}</div>{% endif %}
+                </div>
+              </div>
+            {% endif %}
+            <div class="admin-order-actions">
+              <a class="btn" href="{{ url_for('order_detail', order_id=o.id) }}">View</a>
+              {% if o.status == 'Pending' %}
+                <form method="post" action="{{ url_for('admin_accept_order', order_id=o.id) }}" style="display:inline-block">
+                  <button class="btn" type="submit">Accept</button>
+                </form>
+                <form method="post" action="{{ url_for('admin_reject_order', order_id=o.id) }}" style="display:inline-block" onsubmit="return confirm('Reject order #{{ o.id }}?')">
+                  <button class="btn" type="submit">Reject</button>
+                </form>
+              {% endif %}
+              {% if o.status == 'Rejected' %}
+                <form method="post" action="{{ url_for('admin_delete_order', order_id=o.id) }}" style="display:inline-block" onsubmit="return confirm('Delete rejected order #{{ o.id }}? This will remove all messages and cannot be undone.')">
+                  <button class="btn" type="submit" style="background:#e74c3c">Delete</button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <p>No orders.</p>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

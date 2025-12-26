@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Admin — Verma Fashions{% endblock %}
+{% block content %}
+  <h2>Admin Dashboard</h2>
+  <section class="admin-products">
+    <h3>Products</h3>
+    <form method="post" action="{{ url_for('admin_product_new') }}" enctype="multipart/form-data" class="form upload-form card">
+      <h4 class="upload-title">Add New Product</h4>
+      <div class="upload-grid">
+        <div>
+          <label>Product name</label>
+          <input name="name" required placeholder="E.g. Rose Lipstick">
+        </div>
+        <div>
+          <label>Price (₹)</label>
+          <input name="price" type="number" step="0.01" required placeholder="0.00">
+        </div>
+        <div>
+          <label>Quantity (stock)</label>
+          <input name="quantity" type="number" min="0" value="0" required>
+        </div>
+        <div>
+          <label>Image</label>
+          <input name="image" type="file" accept="image/*">
+        </div>
+      </div>
+      <label>Description</label>
+      <textarea name="description" placeholder="Short product description"></textarea>
+      <div class="upload-actions">
+        <button class="btn" type="submit">Add Product</button>
+      </div>
+    </form>
+
+    <div class="admin-product-list">
+      {% for p in products %}
+        <div class="admin-product card">
+          {% if p.image_filename %}
+            <img src="/static/uploads/{{ p.image_filename }}" alt="{{ p.name }}">
+          {% else %}
+            <div class="no-thumb">No image</div>
+          {% endif %}
+          <div class="admin-product-info">
+            <strong>{{ p.name }}</strong>
+            <div class="meta">Stock: <strong>{{ p.quantity }}</strong> • Price: ₹{{ '%.2f'|format(p.price) }}</div>
+            <div class="desc">{{ p.description }}</div>
+          </div>
+        </div>
+      {% else %}
+        <p>No products yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+  <section class="received-orders">
+    <h3>Received Orders</h3>
+    <div class="orders-list">
+      {% for o in orders %}
+        <div class="order-card card">
+          <div class="order-left">
+            <div class="order-id">#{{ o.id }}</div>
+            <div class="order-product">{{ o.product }} × {{ o.quantity }}</div>
+          </div>
+          <div class="order-right">
+            <div class="order-meta">{{ o.status }} • {{ o.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+            <div class="order-buyer">{{ o.user.name }} — {{ o.user.email }}</div>
+            <a class="btn" href="{{ url_for('order_detail', order_id=o.id) }}">View</a>
+          </div>
+        </div>
+      {% else %}
+        <p>No orders.</p>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

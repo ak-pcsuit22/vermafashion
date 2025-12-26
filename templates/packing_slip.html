@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Packing Slip #{{ order.id }}</title>
+    <style>
+      body{ font-family: Arial, Helvetica, sans-serif; padding:20px }
+      .slip{ max-width:800px; margin:0 auto; border:1px solid #ddd; padding:18px }
+      h1{ margin:0 0 12px 0 }
+      .meta{ display:flex; justify-content:space-between; margin-bottom:12px }
+      .address{ margin-top:12px }
+      .prod { margin-top:18px; padding:8px; border-top:1px dashed #ddd }
+      .print-actions{ margin-top:14px }
+      @media print{ .print-actions{ display:none } }
+    </style>
+  </head>
+  <body>
+    <div class="slip">
+      <h1>Packing Slip</h1>
+      <div class="meta">
+        <div>Order: #{{ order.id }}<br>Placed: {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+        <div>Status: {{ order.status }}</div>
+      </div>
+
+      <h3>Buyer</h3>
+      <div>{{ order.user.name }} — <a href="mailto:{{ order.user.email }}">{{ order.user.email }}</a></div>
+      {% if order.phone %}<div>Phone: {{ order.phone }}</div>{% endif %}
+
+      <div class="address">
+        <strong>Shipping Address</strong>
+        <div>{{ order.address }}</div>
+        <div style="margin-top:6px">
+          {% if order.house_no %}<div>House/Flat: {{ order.house_no }}</div>{% endif %}
+          {% if order.street %}<div>Street: {{ order.street }}</div>{% endif %}
+          {% if order.block %}<div>Block/Sector: {{ order.block }}</div>{% endif %}
+          {% if order.village %}<div>Village/Area: {{ order.village }}</div>{% endif %}
+          {% if order.city %}<div>City: {{ order.city }}</div>{% endif %}
+          {% if order.state %}<div>State: {{ order.state }}</div>{% endif %}
+          {% if order.zipcode %}<div>Zipcode: {{ order.zipcode }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="prod">
+        <strong>Product:</strong> {{ order.product }}
+        <div>Quantity: {{ order.quantity }}</div>
+      </div>
+
+      <div class="print-actions">
+        <button onclick="window.print()">Print</button>
+      </div>
+    </div>
+  </body>
+</html>

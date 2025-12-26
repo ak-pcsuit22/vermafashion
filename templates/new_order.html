@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}New Order — Verma Fashions{% endblock %}
+{% block content %}
+  <h2>Place New Order</h2>
+  {% if product %}
+    <div class="product-tile single">
+      {% if product.image_filename %}
+        <img src="/static/uploads/{{ product.image_filename }}" alt="{{ product.name }}">
+      {% endif %}
+      <div class="product-body">
+        <h3>{{ product.name }}</h3>
+        <p class="price">₹{{ '%.2f'|format(product.price) }}</p>
+        <p class="desc">{{ product.description }}</p>
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" class="form">
+    {% if product %}
+      <input type="hidden" name="product" value="{{ product.name }}">
+    {% else %}
+      <label>Product</label>
+      <input name="product" required>
+    {% endif %}
+
+    <label>Quantity</label>
+    <input name="quantity" type="number" value="1" min="1">
+    <button type="submit">Place Order</button>
+  </form>
+{% endblock %}
+

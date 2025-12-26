@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}My Orders — Verma Fashions{% endblock %}
+{% block content %}
+  <h2>My Orders</h2>
+  <a class="btn" href="{{ url_for('new_order') }}">New Order</a>
+  <ul class="list">
+    {% for o in orders %}
+      <li>
+        <a href="{{ url_for('order_detail', order_id=o.id) }}">#{{ o.id }} - {{ o.product }} ({{ o.quantity }})</a>
+        <span class="status">{{ o.status }}</span>
+      </li>
+    {% else %}
+      <li>No orders yet.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

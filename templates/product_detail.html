@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} — Verma Fashions{% endblock %}
+{% block content %}
+  <div class="product-detail">
+    <div class="product-detail-inner">
+      <div class="product-images">
+        {% if product.image_filename %}
+          <img src="/static/uploads/{{ product.image_filename }}" alt="{{ product.name }}">
+        {% else %}
+          <div class="no-image">No image</div>
+        {% endif %}
+      </div>
+      <div class="product-info">
+        <h2>{{ product.name }}</h2>
+        <p class="price">₹{{ '%.2f'|format(product.price) }}</p>
+        <p class="desc">{{ product.description }}</p>
+        <p class="stock">Stock: {{ product.quantity }}</p>
+
+        {% if current_user.is_authenticated %}
+          <form method="post" action="{{ url_for('cart_add') }}">
+            <input type="hidden" name="product_id" value="{{ product.id }}">
+            <label>Quantity</label>
+            <input type="number" name="quantity" value="1" min="1" style="width:80px">
+            <button class="btn" type="submit">Add to Cart</button>
+          </form>
+        {% else %}
+          <a class="btn" href="{{ url_for('login') }}">Login to Order</a>
+        {% endif %}
+
+        {% if current_user.is_admin %}
+          <div style="margin-top:12px">
+            <a class="btn" href="{{ url_for('admin_view_products') }}">Manage Products</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Order #{{ order.id }} — Verma Fashions{% endblock %}
+{% block content %}
+  <h2>Order #{{ order.id }}</h2>
+  <div class="order-detail">
+    <div class="order-summary">
+      <div class="order-product-block">
+        {% if order.product_id and order.product_obj and order.product_obj.image_filename %}
+          <img class="order-prod-thumb" src="/static/uploads/{{ order.product_obj.image_filename }}" alt="{{ order.product }}">
+        {% endif %}
+        <div class="order-prod-meta">
+          <div><strong>Product:</strong> {{ order.product }}</div>
+          {% if order.product_id %}
+            <div><a href="{{ url_for('product_detail', product_id=order.product_id) }}">View product</a></div>
+          {% endif %}
+          <div><strong>Quantity:</strong> {{ order.quantity }}</div>
+          <div><strong>Status:</strong> {{ order.status }}</div>
+          {% if order.reject_reason %}
+            <div class="reject-reason"><strong>Reject reason:</strong> {{ order.reject_reason }}</div>
+          {% endif %}
+          <div><strong>Placed:</strong> {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+        </div>
+      </div>
+
+      <div class="order-buyer-block">
+        <h4>Buyer</h4>
+        <div><strong>Name:</strong> {{ order.user.name }}</div>
+        <div><strong>Email:</strong> <a href="mailto:{{ order.user.email }}">{{ order.user.email }}</a></div>
+        {% if order.phone %}<div><strong>Phone:</strong> <a href="tel:{{ order.phone }}">{{ order.phone }}</a></div>{% endif %}
+        {% if order.name and (order.name != order.user.name) %}<div><strong>Contact name:</strong> {{ order.name }}</div>{% endif %}
+        {% if order.address %}
+          <div class="order-detail-address"><strong>Address:</strong>
+            <div class="address-text">{{ order.address }}</div>
+            <div class="address-components">
+              {% if order.house_no %}<div><strong>House/Flat:</strong> {{ order.house_no }}</div>{% endif %}
+              {% if order.street %}<div><strong>Street:</strong> {{ order.street }}</div>{% endif %}
+              {% if order.block %}<div><strong>Block/Sector:</strong> {{ order.block }}</div>{% endif %}
+              {% if order.village %}<div><strong>Village/Area:</strong> {{ order.village }}</div>{% endif %}
+              {% if order.city %}<div><strong>City:</strong> {{ order.city }}</div>{% endif %}
+              {% if order.state %}<div><strong>State:</strong> {{ order.state }}</div>{% endif %}
+              {% if order.zipcode %}<div><strong>Zipcode:</strong> {{ order.zipcode }}</div>{% endif %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% if current_user.is_admin %}
+    <p><a class="btn" target="_blank" href="{{ url_for('admin_packing_slip', order_id=order.id) }}">Open Packing Slip (Print)</a></p>
+  {% endif %}
+
+  <div class="order-actions">
+    {% if current_user.is_admin and order.status == 'Pending' %}
+      <form method="post" action="{{ url_for('admin_accept_order', order_id=order.id) }}" style="display:inline-block">
+        <button class="btn" type="submit">Accept Order</button>
+      </form>
+      <form method="post" action="{{ url_for('admin_reject_order', order_id=order.id) }}" style="display:inline-block; vertical-align:top">
+        <label style="display:block; font-weight:700; margin-bottom:6px">Reject reason (optional)</label>
+        <textarea name="reason" placeholder="Write a short reason for rejection" style="width:320px; height:80px; display:block; margin-bottom:6px"></textarea>
+        <button class="btn" type="submit" onclick="return confirm('Reject order #{{ order.id }}?')">Reject Order</button>
+      </form>
+    {% endif %}
+
+    {% if current_user.is_admin and order.status == 'Rejected' %}
+      <form method="post" action="{{ url_for('admin_delete_order', order_id=order.id) }}" style="display:inline-block; margin-left:12px" onsubmit="return confirm('Delete rejected order #{{ order.id }}? This will remove all messages and cannot be undone.')">
+        <button class="btn" type="submit" style="background:#e74c3c">Delete Order</button>
+      </form>
+    {% endif %}
+
+    {% if current_user.is_authenticated and current_user.id == order.user_id %}
+      {% if order.status == 'Pending' %}
+        <form method="post" action="{{ url_for('user_cancel_order', order_id=order.id) }}" style="display:inline-block">
+          <button class="btn" type="submit" onclick="return confirm('Cancel this order?')">Cancel Order</button>
+        </form>
+      {% else %}
+        <div class="note">Order cannot be cancelled (status: {{ order.status }})</div>
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <h3>Messages</h3>
+  <ul class="messages-list">
+    {% for m in order.messages %}
+      <li class="msg-item">
+        <div class="msg-head"><strong>{{ m.sender }}{% if m.is_admin %} (Admin){% endif %}</strong>
+          <span class="msg-time">{{ m.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+        </div>
+        <div class="msg-body">{{ m.content }}</div>
+      </li>
+    {% else %}
+      <li>No messages yet.</li>
+    {% endfor %}
+  </ul>
+  <form method="post" class="form">
+    <label>Send message</label>
+    <textarea name="content" required></textarea>
+    <button type="submit">Send</button>
+  </form>
+{% endblock %}

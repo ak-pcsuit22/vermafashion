@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Your Cart — Verma Fashions{% endblock %}
+{% block content %}
+  <h2>Your Cart</h2>
+  {% if items %}
+    <form method="post" action="{{ url_for('cart_update') }}" class="cart-form">
+      <div class="cart-list">
+        {% for it in items %}
+          <div class="cart-item">
+            <div class="cart-thumb">
+              {% if it.product.image_filename %}
+                <img src="/static/uploads/{{ it.product.image_filename }}" alt="{{ it.product.name }}">
+              {% else %}
+                <div class="no-image">No Image</div>
+              {% endif %}
+            </div>
+            <div class="cart-meta">
+              <div class="cart-name">{{ it.product.name }}</div>
+              <div class="cart-price">₹{{ '%.2f'|format(it.product.price) }}</div>
+              <div class="cart-qty">
+                <label>Qty</label>
+                <input name="qty_{{ it.product.id }}" type="number" min="0" value="{{ it.quantity }}">
+              </div>
+            </div>
+            <div class="cart-sub">₹{{ '%.2f'|format(it.product.price * it.quantity) }}</div>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="cart-summary">
+        <div>Total: <strong>₹{{ '%.2f'|format(total) }}</strong></div>
+        {% if not proceed_allowed %}
+          <div style="color:#b43131; margin-top:6px">Minimum order ₹{{ min_amount }} required (or add at least {{ min_items }} items) to proceed.</div>
+        {% endif %}
+        <div class="cart-actions">
+          <button class="btn" type="submit">Update Cart</button>
+          {% if proceed_allowed %}
+            <a class="btn" href="{{ url_for('cart_address') }}">Proceed to Address</a>
+          {% else %}
+            <button class="btn" type="button" disabled style="opacity:0.65; cursor:not-allowed">Proceed to Address</button>
+          {% endif %}
+        </div>
+      </div>
+    </form>
+  {% else %}
+    <p>Your cart is empty. <a href="{{ url_for('products') }}">Browse products</a>.</p>
+  {% endif %}
+{% endblock %}

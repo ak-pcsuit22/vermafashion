@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Home — Verma Fashions{% endblock %}
+{% block content %}
+  <section class="welcome-hero">
+    <div class="welcome-inner container-wide centered">
+      <div class="welcome-text">
+        <h1 class="welcome-title">Welcome to <span class="brand-word">Verma Fashions</span></h1>
+        <p class="welcome-sub">Cosmetics &amp; artificial jewellery store.</p>
+        {% if current_user.is_authenticated %}
+          <p class="welcome-greet">Hello, {{ current_user.name }} — <a class="welcome-cta" href="{{ url_for('new_order') }}">Place a new order</a></p>
+        {% else %}
+          <p class="welcome-greet"><a class="welcome-cta" href="{{ url_for('login') }}">Login</a> or <a class="welcome-cta muted" href="{{ url_for('register') }}">Register</a> to place orders.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-left">
+        <h2>Beauty & Sparkle</h2>
+        <p>Handpicked cosmetics and artificial jewellery to make you shine.</p>
+        <p><a class="cta" href="{{ url_for('products') }}">Shop Now</a></p>
+      </div>
+      <div class="hero-right">
+        <div class="hero-banner">
+          <img src="/static/uploads/hero_banner.jpg" alt="Verma Fashions banner">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <h2 class="products-title">Featured Products</h2>
+  <div class="products-grid">
+    {% for p in products %}
+      <div class="product-tile">
+        {% if p.image_filename %}
+          <a href="{{ url_for('product_detail', product_id=p.id) }}"><img src="/static/uploads/{{ p.image_filename }}" alt="{{ p.name }}"></a>
+        {% else %}
+          <div class="no-image"><a href="{{ url_for('product_detail', product_id=p.id) }}">No image</a></div>
+        {% endif %}
+        <div class="product-body">
+          <h3><a href="{{ url_for('product_detail', product_id=p.id) }}">{{ p.name }}</a></h3>
+          <p class="price">₹{{ '%.2f'|format(p.price) }}</p>
+          <p class="desc">{{ p.description }}</p>
+          {% if current_user.is_authenticated %}
+            <form method="post" action="{{ url_for('cart_add') }}" style="display:inline-block">
+              <input type="hidden" name="product_id" value="{{ p.id }}">
+              <input type="number" name="quantity" value="1" min="1" style="width:60px">
+              <button class="btn" type="submit">Add to Cart</button>
+            </form>
+          {% else %}
+            <a class="btn" href="{{ url_for('login') }}">Login to Order</a>
+          {% endif %}
+          <div class="stock">Stock: {{ p.quantity }}</div>
+        </div>
+      </div>
+    {% else %}
+      <p>No products yet.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

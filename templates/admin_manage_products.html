@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Admin — Manage Products — Verma Fashions{% endblock %}
+{% block content %}
+  <h2>Admin — Manage Products</h2>
+  <section class="admin-products">
+    <form method="post" action="{{ url_for('admin_product_new') }}" enctype="multipart/form-data" class="form upload-form card">
+      <h4 class="upload-title">Add New Product</h4>
+      <div class="upload-grid">
+        <div>
+          <label>Product name</label>
+          <input name="name" required placeholder="E.g. Rose Lipstick">
+        </div>
+        <div>
+          <label>Price (₹)</label>
+          <input name="price" type="number" step="0.01" required placeholder="0.00">
+        </div>
+        <div>
+          <label>Quantity (stock)</label>
+          <input name="quantity" type="number" min="0" value="0" required>
+        </div>
+        <div>
+          <label>Image</label>
+          <input name="image" type="file" accept="image/*">
+        </div>
+      </div>
+      <label>Description</label>
+      <textarea name="description" placeholder="Short product description"></textarea>
+      <div class="upload-actions">
+        <button class="btn" type="submit">Add Product</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}

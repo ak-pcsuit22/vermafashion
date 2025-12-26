@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Shipping Address — Verma Fashions{% endblock %}
+{% block content %}
+  <h2>Shipping Address</h2>
+  <div class="card address-card">
+    <form method="post" action="{{ url_for('cart_address') }}" class="address-form">
+      <div class="grid">
+        <div>
+          <label>Name</label>
+          <input name="name" required>
+        </div>
+        <div>
+          <label>Phone</label>
+          <input name="phone" required>
+        </div>
+        <div>
+          <label>House / Flat No.</label>
+          <input name="house_no" placeholder="House / Flat No">
+        </div>
+        <div>
+          <label>Street / Road</label>
+          <input name="street" placeholder="Street or Road">
+        </div>
+        <div>
+          <label>Block / Sector</label>
+          <input name="block" placeholder="Block or Sector">
+        </div>
+        <div>
+          <label>Village / Area</label>
+          <input name="village" placeholder="Village or Area">
+        </div>
+        <div>
+          <label>City</label>
+          <input name="city" placeholder="City">
+        </div>
+        <div>
+          <label>State</label>
+          <input name="state" placeholder="State">
+        </div>
+        <div>
+          <label>Zipcode / PIN</label>
+          <input name="zipcode" placeholder="Zipcode">
+        </div>
+        <div style="grid-column:1/-1">
+          <label>Full Address (optional — will be used if provided)</label>
+          <input id="address" name="address" placeholder="Flat 12, ABC Apartments, Near XYZ" >
+        </div>
+      </div>
+
+      <p style="margin-top:8px">
+        <button type="button" class="btn" id="loc-btn">Use my location</button>
+      </p>
+      <div style="margin-top:12px">
+        <button class="btn" type="submit">Place Order</button>
+        <a class="btn" href="{{ url_for('cart_view') }}">Back to Cart</a>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('loc-btn').addEventListener('click', function(){
+      if (!navigator.geolocation) { alert('Geolocation not supported'); return; }
+      navigator.geolocation.getCurrentPosition(function(pos){
+        const lat = pos.coords.latitude; const lon = pos.coords.longitude;
+        fetch('{{ url_for('reverse_geocode') }}', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({lat: lat, lon: lon})
+        }).then(r=>r.json()).then(data=>{
+          if (data.address) {
+            // place address into full address field and also try to split
+            document.getElementById('address').value = data.address;
+          } else alert('Address not found');
+        }).catch(()=> alert('Failed to reverse geocode'));
+      }, function(err){ alert('Could not get location: '+err.message); });
+    });
+  </script>
+{% endblock %}
